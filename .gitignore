@@ -1,0 +1,15 @@
+# Rust
+rs/target/
+
+# Node.js
+ts/node_modules/
+ts/dist/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Environment
+.env
