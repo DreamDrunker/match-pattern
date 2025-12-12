@@ -21,12 +21,11 @@ export const initMatchPattern = async (): Promise<void> => {
     if (typeof wasm.default === "function") {
       if (typeof process !== "undefined" && process.versions?.node) {
         const { readFile } = await import("fs/promises");
-        const { fileURLToPath } = await import("url");
         const { dirname, join } = await import("path");
-        const wasmPath = join(
-          dirname(fileURLToPath(import.meta.url)),
-          "../node_modules/@weiqu_/match-pattern-rs/match_pattern_rs_bg.wasm",
-        );
+        const { createRequire } = await import("module");
+        const require = createRequire(import.meta.url);
+        const pkgPath = dirname(require.resolve("@weiqu_/match-pattern-rs"));
+        const wasmPath = join(pkgPath, "match_pattern_rs_bg.wasm");
         const wasmBuffer = await readFile(wasmPath);
         await wasm.default({ module_or_path: wasmBuffer });
       } else {

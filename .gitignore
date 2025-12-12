@@ -2,7 +2,7 @@
 rs/target/
 
 # Node.js
-ts/node_modules/
+node_modules/
 ts/dist/
 
 # OS

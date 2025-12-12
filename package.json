@@ -1,0 +1,8 @@
+{
+  "name": "match-pattern-monorepo",
+  "private": true,
+  "workspaces": [
+    "rs/pkg",
+    "ts"
+  ]
+}
