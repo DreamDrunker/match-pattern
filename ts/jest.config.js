@@ -2,6 +2,7 @@
 export default {
   testEnvironment: "node",
   extensionsToTreatAsEsm: [".ts"],
+  testMatch: ["**/*.node.test.ts"],
   transform: {
     "^.+\\.ts$": [
       "ts-jest",

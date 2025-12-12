@@ -1,7 +1,18 @@
+import { readFile } from "fs/promises";
+import { dirname, join } from "path";
+import { createRequire } from "module";
 import { initMatchPattern, match } from "../src/index";
 
+const loadWasmForNode = async (): Promise<Uint8Array> => {
+  const require = createRequire(import.meta.url);
+  const pkgPath = dirname(require.resolve("@weiqu_/match-pattern-rs"));
+  const buffer = await readFile(join(pkgPath, "match_pattern_rs_bg.wasm"));
+  return new Uint8Array(buffer);
+};
+
 beforeAll(async () => {
-  await initMatchPattern();
+  const wasmBuffer = await loadWasmForNode();
+  await initMatchPattern(wasmBuffer);
 });
 
 describe("match-pattern", () => {

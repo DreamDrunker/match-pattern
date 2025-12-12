@@ -14,19 +14,12 @@ type WasmModule = {
 
 let wasmModule: WasmModule | null = null;
 
-export const initMatchPattern = async (): Promise<void> => {
+export const initMatchPattern = async (wasmBuffer?: Uint8Array): Promise<void> => {
   if (wasmModule) return;
   try {
     const wasm = await import("@weiqu_/match-pattern-rs");
     if (typeof wasm.default === "function") {
-      if (typeof process !== "undefined" && process.versions?.node) {
-        const { readFile } = await import("fs/promises");
-        const { dirname, join } = await import("path");
-        const { createRequire } = await import("module");
-        const require = createRequire(import.meta.url);
-        const pkgPath = dirname(require.resolve("@weiqu_/match-pattern-rs"));
-        const wasmPath = join(pkgPath, "match_pattern_rs_bg.wasm");
-        const wasmBuffer = await readFile(wasmPath);
+      if (wasmBuffer) {
         await wasm.default({ module_or_path: wasmBuffer });
       } else {
         await wasm.default();
