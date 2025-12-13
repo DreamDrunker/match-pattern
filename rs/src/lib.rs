@@ -3,25 +3,25 @@ mod parser;
 mod types;
 mod utils;
 
-pub use types::{MatchBranch, Pattern};
+pub use types::Pattern;
 pub use utils::{ObjectWithProps, log};
 
 use js_sys::{Object, Reflect};
 use wasm_bindgen::prelude::*;
 
 use crate::matcher::check_pattern;
-use crate::parser::parse_branches;
+use crate::parser::parse_patterns;
 
 #[wasm_bindgen]
-pub fn match_pattern(data: JsValue, branches: JsValue) -> Result<JsValue, JsValue> {
-    let branches_vec = parse_branches(&branches)?;
+pub fn match_pattern(data: JsValue, patterns: JsValue) -> Result<JsValue, JsValue> {
+    let patterns_vec = parse_patterns(&patterns)?;
 
-    for (index, branch) in branches_vec.iter().enumerate() {
+    for (index, pattern) in patterns_vec.iter().enumerate() {
         log(&format!("检查分支 {}", index));
 
-        if check_pattern(&data, &branch.pattern)? {
+        if check_pattern(&data, pattern)? {
             log(&format!("✓ 分支 {} 匹配！", index));
-            return Ok(branch.result.clone());
+            return Ok(JsValue::from_f64(index as f64));
         }
     }
 
@@ -52,7 +52,6 @@ mod tests {
     use js_sys::{Array, Function, Object, Reflect};
     use wasm_bindgen_test::*;
 
-    // 导入内部模块用于测试
     use crate::matcher::{
         check_array_equal, check_object_equal, check_object_match, check_pattern, check_value_equal,
     };
@@ -69,18 +68,6 @@ mod tests {
         match p2 {
             Pattern::Value(v) => assert_eq!(v.as_string().unwrap(), "test"),
             _ => panic!("should be Pattern::Value"),
-        }
-    }
-
-    #[wasm_bindgen_test]
-    fn test_match_branch_creation() {
-        let branch = MatchBranch {
-            pattern: Pattern::Wildcard,
-            result: JsValue::from_str("test"),
-        };
-        match branch.pattern {
-            Pattern::Wildcard => assert!(true),
-            _ => panic!("should be Pattern::Wildcard"),
         }
     }
 
@@ -257,25 +244,18 @@ mod tests {
 
     #[wasm_bindgen_test]
     fn test_full_match() {
-        let branches = Array::from_iter([
+        let patterns = Array::from_iter([
             Object::new()
-                .with_prop(
-                    "pattern",
-                    Object::new()
-                        .with_prop("type", "Value")
-                        .with_prop("value", JsValue::from_f64(1.0)),
-                )
-                .with_prop("result", "matched"),
-            Object::new()
-                .with_prop("pattern", Object::new().with_prop("type", "Wildcard"))
-                .with_prop("result", "default"),
+                .with_prop("type", "Value")
+                .with_prop("value", JsValue::from_f64(1.0)),
+            Object::new().with_prop("type", "Wildcard"),
         ]);
 
         let data_matched = JsValue::from_f64(1.0);
         let data_default = JsValue::from_f64(0.0);
-        let result_matched = match_pattern(data_matched, branches.clone().into()).unwrap();
-        let result_default = match_pattern(data_default, branches.clone().into()).unwrap();
-        assert_eq!(result_matched, "matched");
-        assert_eq!(result_default, "default");
+        let result_matched = match_pattern(data_matched, patterns.clone().into()).unwrap();
+        let result_default = match_pattern(data_default, patterns.clone().into()).unwrap();
+        assert_eq!(result_matched.as_f64().unwrap(), 0.0);
+        assert_eq!(result_default.as_f64().unwrap(), 1.0);
     }
 }

@@ -3,27 +3,26 @@ import {
   MatcherWithPattern,
   Pattern,
   PatternInput,
-  WasmBranch,
+  ResultEntry,
 } from "./types";
 
 type WasmModule = {
-  match_pattern: <T, R>(data: T, branches: WasmBranch<T, R>[]) => R | undefined;
+  match_pattern: <T, R>(data: T, branches: PatternInput<T>[]) => R | undefined;
   log: (message: string) => void;
   test_reflect: () => void;
 };
 
 let wasmModule: WasmModule | null = null;
 
-export const initMatchPattern = async (wasmBuffer?: Uint8Array): Promise<void> => {
+export const initMatchPattern = async (
+  wasmBuffer?: Uint8Array,
+): Promise<void> => {
   if (wasmModule) return;
   try {
     const wasm = await import("@weiqu_/match-pattern-rs");
     if (typeof wasm.default === "function") {
-      if (wasmBuffer) {
-        await wasm.default({ module_or_path: wasmBuffer });
-      } else {
-        await wasm.default();
-      }
+      if (wasmBuffer) await wasm.default({ module_or_path: wasmBuffer });
+      else await wasm.default();
     }
     wasmModule = wasm as WasmModule;
   } catch (e) {
@@ -31,35 +30,49 @@ export const initMatchPattern = async (wasmBuffer?: Uint8Array): Promise<void> =
   }
 };
 
-export const match = <T>(data: T): Matcher<T> => {
-  const branches: WasmBranch<T, unknown>[] = [];
-  const matcher: Matcher<T, any> = {
-    when: (pattern: Pattern<T>): MatcherWithPattern<T, any> => ({
-      to: (value) => {
-        branches.push({
-          pattern: convertPattern(pattern),
-          result: value,
-        });
-        return matcher;
+export const match = <T>(data: T): Matcher<T, never> => {
+  const branches: PatternInput<T>[] = [];
+  const result: ResultEntry<T, unknown>[] = [];
+
+  const createMatcher = <R>(): Matcher<T, R> => {
+    const matcher: Matcher<T, R> = {
+      when: (pattern: Pattern<T>) => ({
+        to: <TResult>(value: TResult) => {
+          branches.push(convertPattern(pattern));
+          result.push({ value: value, isMapper: false });
+          return createMatcher<R | TResult>();
+        },
+        map: <TResult>(fn: (data: T) => TResult) => {
+          branches.push(convertPattern(pattern));
+          result.push({ value: fn, isMapper: true });
+          return createMatcher<R | TResult>();
+        },
+      }),
+      otherwise: <TResult>(value: TResult) => {
+        branches.push(convertPattern(undefined as Pattern<T>));
+        result.push({ value: value, isMapper: false });
+        return matcher.run() as R | TResult;
       },
-    }),
-    otherwise: (value) => {
-      branches.push({
-        pattern: { type: "Wildcard" },
-        result: value,
-      });
-      return matcher.run();
-    },
-    run: () => {
-      if (!wasmModule) {
-        throw new Error(
-          "match-pattern not initialized. Call initMatchPattern() first.",
+      run: (): R => {
+        if (!wasmModule)
+          throw new Error(
+            "match-pattern not initialized. Call initMatchPattern() first.",
+          );
+        const wasmIndex: number | undefined = wasmModule.match_pattern(
+          data,
+          branches,
         );
-      }
-      return wasmModule.match_pattern(data, branches);
-    },
+        if (result.length === 0) throw new Error("run what?");
+        if (wasmIndex === undefined) throw new Error("No match found");
+        const entry = result[wasmIndex];
+        if (entry.isMapper) return entry.value(data) as R;
+        return entry.value as R;
+      },
+    };
+    return matcher;
   };
-  return matcher as Matcher<T>;
+
+  return createMatcher<never>();
 };
 
 const convertPattern = <T>(pattern: Pattern<T>): PatternInput<T> => {
