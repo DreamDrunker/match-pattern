@@ -42,4 +42,31 @@ describe("match-pattern (browser)", () => {
       .otherwise("default");
     expect(result).toBe("greater than 2");
   });
+
+  it("should transform value with map", () => {
+    const result = match(5)
+      .when((x) => x > 2)
+      .map((x) => x * 2)
+      .otherwise(0);
+    expect(result).toBe(10);
+  });
+
+  it("should use map with object pattern", () => {
+    const user = { name: "Alice", age: 25 };
+    const result = match(user)
+      .when({ age: 25 })
+      .map((u) => `${u.name} is 25 years old`)
+      .otherwise("unknown");
+    expect(result).toBe("Alice is 25 years old");
+  });
+
+  it("should mix to and map", () => {
+    const result = match(10)
+      .when(5)
+      .to("five")
+      .when((x) => x > 5)
+      .map((x) => `greater: ${x}`)
+      .otherwise("default");
+    expect(result).toBe("greater: 10");
+  });
 });

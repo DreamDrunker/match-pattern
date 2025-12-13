@@ -1,26 +1,16 @@
 use js_sys::{Array, Reflect};
 use wasm_bindgen::prelude::*;
 
-use crate::types::{MatchBranch, Pattern};
+use crate::types::Pattern;
 
-pub fn parse_branches(branches_js: &JsValue) -> Result<Vec<MatchBranch>, JsValue> {
-    if !Array::is_array(branches_js) {
-        return Err(JsValue::from_str("branches must be an array"));
+pub fn parse_patterns(patterns_js: &JsValue) -> Result<Vec<Pattern>, JsValue> {
+    if !Array::is_array(patterns_js) {
+        return Err(JsValue::from_str("patterns must be an array"));
     }
 
-    Array::from(branches_js)
+    Array::from(patterns_js)
         .iter()
-        .map(|item| {
-            let pattern_js = Reflect::get(&item, &JsValue::from_str("pattern"))
-                .map_err(|_| JsValue::from_str("Missing 'pattern' field"))?;
-
-            let result = Reflect::get(&item, &JsValue::from_str("result"))
-                .map_err(|_| JsValue::from_str("Missing 'result' field"))?;
-
-            let pattern = parse_pattern(&pattern_js)?;
-
-            Ok(MatchBranch { pattern, result })
-        })
+        .map(|item| parse_pattern(&item))
         .collect()
 }
 

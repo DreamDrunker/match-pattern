@@ -7,9 +7,3 @@ pub enum Pattern {
     Function(JsValue),
     Wildcard,
 }
-
-#[derive(Debug, Clone)]
-pub struct MatchBranch {
-    pub pattern: Pattern,
-    pub result: JsValue,
-}

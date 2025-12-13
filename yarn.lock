@@ -1341,11 +1341,6 @@
     "@vitest/pretty-format" "4.0.15"
     tinyrainbow "^3.0.3"
 
-"@weiqu_/match-pattern-rs@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@weiqu_/match-pattern-rs/-/match-pattern-rs-0.1.0.tgz#5490253600ebbfc4445f9f94775b2f86c1774b00"
-  integrity sha512-wsECEcdz5Ev11sYN0g6zxfDwNB4++pk3sLqdfBD9e7t5cS9zP0dkrsfCVClj03UBoGOnQYKVJH1eAxRsiYDyZA==
-
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
