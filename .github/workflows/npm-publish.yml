@@ -1,0 +1,42 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+name: Publish to NPM
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish-rs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - run: wasm-pack build --target web --scope weiqu_
+        working-directory: rs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - run: wasm-pack publish --access public
+        working-directory: rs
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-ts:
+    runs-on: ubuntu-latest
+    needs: publish-rs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn install
+      - run: yarn build
+        working-directory: ts
+      - run: npm publish --access public
+        working-directory: ts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
