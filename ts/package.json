@@ -18,7 +18,7 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@weiqu_/match-pattern-rs": "^0.1.0"
+    "@weiqu_/match-pattern-rs": "^0.2.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
