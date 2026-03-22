@@ -1,9 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { compileProgramInJs, createMatchEngine } from "../src/advanced";
 import {
   and,
-  compileProgramInJs,
-  createMatchEngine,
   eq,
   gt,
   isNumber,

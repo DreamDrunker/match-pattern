@@ -254,7 +254,7 @@ export const compileProgramInJs = (program: CompileProgram): CompilePlan => {
       diagnostics.push({
         code: "dynamic_slot",
         level: "info",
-        message: `branch ${branchIndex} contains runtime slot predicate`,
+        message: `branch ${branchIndex} contains runtime slot predicate and cannot be fully proven at compile time`,
         branchIndex,
       });
     }

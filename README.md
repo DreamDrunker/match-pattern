@@ -14,6 +14,12 @@
 2. 构建期接入，例如 SWC / 预编译 transform。
 3. benchmark 基线与性能结论。
 
+## 0.3 API 边界
+
+1. Stable：`match`、`initMatchPattern`、常用谓词。
+2. Advanced：`@weiqu_/match-pattern-ts/advanced`，包含 `createMatchEngine`、`compileProgramInJs`。
+3. Internal：`internal/*`、compile plan 细节、生成物细节，不视为公开 API。
+
 ## 包结构
 
 - `ts`：`@weiqu_/match-pattern-ts`
@@ -68,6 +74,17 @@ await initMatchPattern(wasmBuffer);
 
 初始化成功且导出了 `compile_match_plan` 时，编译计划会优先走 Rust/WASM；  
 否则会自动回退到 JS 编译器。
+
+### 1.1) 高级入口
+
+如果你要自定义 engine 或手动编译计划，改用：
+
+```ts
+import {
+  compileProgramInJs,
+  createMatchEngine,
+} from "@weiqu_/match-pattern-ts/advanced";
+```
 
 ### 2) 使用 `match` API
 
@@ -188,3 +205,4 @@ yarn verify:rs-pkg
 
 - 架构说明：`rs/docs/wasm-compiler-match-architecture.md`
 - 发版流程：`RELEASING.md`
+- 0.3 迁移：`MIGRATING-0.3.md`

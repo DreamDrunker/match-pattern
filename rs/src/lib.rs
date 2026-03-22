@@ -8,6 +8,7 @@ pub use types::Pattern;
 pub use utils::{ObjectWithProps, log};
 
 use js_sys::{Object, Reflect};
+use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
 use crate::compiler::{BranchAst, MatchProgram, compile_program};
@@ -41,7 +42,8 @@ pub fn compile_match_plan(program: JsValue) -> Result<JsValue, JsValue> {
         .map_err(|err| JsValue::from_str(&format!("invalid compile program: {}", err)))?;
 
     let plan = compile_program(&parsed_program);
-    serde_wasm_bindgen::to_value(&plan)
+    let serializer = serde_wasm_bindgen::Serializer::json_compatible();
+    plan.serialize(&serializer)
         .map_err(|err| JsValue::from_str(&format!("failed to serialize compile plan: {}", err)))
 }
 

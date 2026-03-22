@@ -119,7 +119,7 @@ pub fn compile_program(program: &MatchProgram) -> CompilePlan {
 
     for (branch_index, branch) in program.branches.iter().enumerate() {
         let action_index = branch.action_index.unwrap_or(branch_index);
-        let predicate = lower_predicate(&branch.predicate);
+        let predicate = lower_predicate(&canonicalize_predicate(&branch.predicate));
 
         if previous.iter().any(|item| covers(item, &predicate)) {
             diagnostics.push(CompileDiagnostic {
@@ -158,6 +158,67 @@ pub fn compile_program(program: &MatchProgram) -> CompilePlan {
         branches: compiled_branches,
         diagnostics,
         dynamic_slot_count,
+    }
+}
+
+fn canonicalize_predicate(predicate: &PredicateAst) -> PredicateAst {
+    match predicate {
+        PredicateAst::Shape { fields, exact } => {
+            let next_fields = fields
+                .iter()
+                .map(|(key, value)| (key.clone(), canonicalize_predicate(value)))
+                .collect::<BTreeMap<_, _>>();
+            let maybe_only_field = next_fields.iter().next();
+            let is_single_field = next_fields.len() == 1;
+            let is_array_index = maybe_only_field
+                .map(|(key, _)| key.chars().all(|ch| ch.is_ascii_digit()))
+                .unwrap_or(false);
+
+            if !exact
+                && is_single_field
+                && !is_array_index
+                && matches!(maybe_only_field, Some((_, PredicateAst::Eq { .. })))
+            {
+                let (key, value) = maybe_only_field.unwrap();
+                let PredicateAst::Eq { value } = value else {
+                    unreachable!();
+                };
+
+                PredicateAst::Tag {
+                    key: key.clone(),
+                    value: value.clone(),
+                }
+            } else {
+                PredicateAst::Shape {
+                    fields: next_fields,
+                    exact: *exact,
+                }
+            }
+        }
+        PredicateAst::And { predicates } => PredicateAst::And {
+            predicates: predicates
+                .iter()
+                .map(canonicalize_predicate)
+                .flat_map(|predicate| match predicate {
+                    PredicateAst::And { predicates } => predicates,
+                    other => vec![other],
+                })
+                .collect(),
+        },
+        PredicateAst::Or { predicates } => PredicateAst::Or {
+            predicates: predicates
+                .iter()
+                .map(canonicalize_predicate)
+                .flat_map(|predicate| match predicate {
+                    PredicateAst::Or { predicates } => predicates,
+                    other => vec![other],
+                })
+                .collect(),
+        },
+        PredicateAst::Not { predicate } => PredicateAst::Not {
+            predicate: Box::new(canonicalize_predicate(predicate)),
+        },
+        _ => predicate.clone(),
     }
 }
 

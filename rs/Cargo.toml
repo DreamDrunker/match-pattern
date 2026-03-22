@@ -1,6 +1,6 @@
 [package]
 name = "match-pattern-rs"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 authors = ["weiqu"]
 description = "Rust/WASM compiler package for the match-pattern monorepo."

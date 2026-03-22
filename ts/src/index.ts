@@ -71,8 +71,6 @@ export const match = <const TData>(data: TData): Matcher<TData, never> =>
 
 export {
   and,
-  compileProgramInJs,
-  createMatchEngine,
   eq,
   exactShape,
   gt,
