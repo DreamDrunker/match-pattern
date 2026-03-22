@@ -7,7 +7,8 @@ beforeAll(async () => {
 
 describe("match-pattern (browser)", () => {
   it("should match exact value", () => {
-    const result = match(5)
+    const value: number = 5;
+    const result = match(value)
       .when(5)
       .to("five")
       .when(10)
@@ -61,10 +62,11 @@ describe("match-pattern (browser)", () => {
   });
 
   it("should mix to and map", () => {
-    const result = match(10)
+    const value: number = 10;
+    const result = match(value)
       .when(5)
       .to("five")
-      .when((x) => x > 5)
+      .when((x: number) => x > 5)
       .map((x) => `greater: ${x}`)
       .otherwise("default");
     expect(result).toBe("greater: 10");

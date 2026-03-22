@@ -1,3 +1,4 @@
+mod compiler;
 mod matcher;
 mod parser;
 mod types;
@@ -9,6 +10,7 @@ pub use utils::{ObjectWithProps, log};
 use js_sys::{Object, Reflect};
 use wasm_bindgen::prelude::*;
 
+use crate::compiler::{BranchAst, MatchProgram, compile_program};
 use crate::matcher::check_pattern;
 use crate::parser::parse_patterns;
 
@@ -27,6 +29,20 @@ pub fn match_pattern(data: JsValue, patterns: JsValue) -> Result<JsValue, JsValu
 
     log("没有匹配的分支");
     Ok(JsValue::UNDEFINED)
+}
+
+#[wasm_bindgen]
+pub fn compile_match_plan(program: JsValue) -> Result<JsValue, JsValue> {
+    let parsed_program = serde_wasm_bindgen::from_value::<MatchProgram>(program.clone())
+        .or_else(|_| {
+            serde_wasm_bindgen::from_value::<Vec<BranchAst>>(program)
+                .map(|branches| MatchProgram { branches })
+        })
+        .map_err(|err| JsValue::from_str(&format!("invalid compile program: {}", err)))?;
+
+    let plan = compile_program(&parsed_program);
+    serde_wasm_bindgen::to_value(&plan)
+        .map_err(|err| JsValue::from_str(&format!("failed to serialize compile plan: {}", err)))
 }
 
 #[wasm_bindgen]
