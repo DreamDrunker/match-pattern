@@ -1,6 +1,21 @@
 {
   "name": "match-pattern-monorepo",
   "private": true,
+  "packageManager": "yarn@1.22.22",
+  "scripts": {
+    "build": "yarn --cwd ts build",
+    "typecheck": "yarn test:ts:typecheck",
+    "test": "yarn test:ts && yarn test:rs",
+    "test:ts": "yarn test:ts:typecheck && yarn test:ts:node && yarn test:ts:browser",
+    "test:ts:typecheck": "yarn --cwd ts typecheck",
+    "test:ts:node": "yarn --cwd ts test:node",
+    "test:ts:browser": "yarn --cwd ts test:browser",
+    "test:rs": "cargo test -q --manifest-path rs/Cargo.toml",
+    "test:rs:wasm": "./scripts/test-rs-wasm.sh",
+    "rebuild:rs-pkg": "./scripts/rebuild-rs-pkg.sh",
+    "verify:rs-pkg": "./scripts/verify-rs-pkg.sh",
+    "version:bump": "node ./scripts/bump-version.mjs"
+  },
   "workspaces": [
     "rs/pkg",
     "ts"
