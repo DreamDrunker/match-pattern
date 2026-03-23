@@ -55,8 +55,10 @@ yarn version:bump 0.2.1
 
 1. 从 `dev` 合并 release PR 到 `main`。
 2. 在 `main` 打对应 tag，例如 `v0.2.1`。
-3. 创建 GitHub Release。
-4. `release.yml` 会重新执行验证，再发布 Rust 包和 TS 包。
+3. 把 tag 推到远程，例如 `git push origin v0.2.1`。
+4. `release.yml` 会重新执行验证，发布 Rust 包和 TS 包，并自动创建或更新 GitHub Release。
+
+如果已有 tag 需要补发，不用重新推 tag，直接手动触发 workflow 并填入 tag 名称即可。
 
 ## Trusted Publishing
 
@@ -73,4 +75,7 @@ npmjs.com 里需要分别给这两个包配置 trusted publisher：
 2. Repository: `match-pattern`
 3. Workflow filename: `release.yml`
 
-Trusted Publishing 验证通过后，这条发布链路不再依赖 `NPM_TOKEN`。
+这条 release workflow 支持两种触发方式：
+
+1. 正常发版：push tag
+2. 补发已有版本：workflow_dispatch + tag 输入
