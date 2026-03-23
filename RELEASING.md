@@ -1,14 +1,16 @@
+English | [简体中文](RELEASING.zh-CN.md)
+
 # Releasing
 
 ## Branches
 
-1. 日常开发进 `dev`。
-2. 发版从 `dev` 提一个 release PR 到 `main`。
-3. tag 只在 `main` 上打。
+1. Day-to-day development goes into `dev`.
+2. Release PRs go from `dev` to `main`.
+3. Tags are created only on `main`.
 
 ## Pre-release Checks
 
-在仓库根目录执行：
+Run these commands from the repository root:
 
 ```bash
 yarn install --frozen-lockfile
@@ -22,13 +24,13 @@ yarn verify:rs-pkg
 
 ## Generated Package
 
-`rs/pkg` 是生成物，不手改。需要更新时执行：
+`rs/pkg` is generated output and should not be edited by hand. Rebuild it with:
 
 ```bash
 yarn rebuild:rs-pkg
 ```
 
-提交前再跑一次：
+Run this again before pushing:
 
 ```bash
 yarn verify:rs-pkg
@@ -36,13 +38,13 @@ yarn verify:rs-pkg
 
 ## Version Bump
 
-统一用一个入口改版本：
+Use a single command to bump versions:
 
 ```bash
 yarn version:bump 0.2.1
 ```
 
-这个命令会同步更新：
+It updates all of these files together:
 
 1. `ts/package.json`
 2. `rs/Cargo.toml`
@@ -51,7 +53,7 @@ yarn version:bump 0.2.1
 
 ## Release Flow
 
-1. 从 `dev` 合并 release PR 到 `main`。
-2. 在 `main` 打对应 tag，例如 `v0.2.1`。
-3. 创建 GitHub Release。
-4. `release.yml` 会重新执行验证，再发布 Rust 包和 TS 包。
+1. Merge the release PR from `dev` into `main`.
+2. Create the release tag on `main`, for example `v0.2.1`.
+3. Create the GitHub Release.
+4. `release.yml` reruns verification and then publishes the Rust and TypeScript packages.
