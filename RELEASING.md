@@ -55,8 +55,10 @@ It updates all of these files together:
 
 1. Merge the release PR from `dev` into `main`.
 2. Create the release tag on `main`, for example `v0.2.1`.
-3. Create the GitHub Release.
-4. `release.yml` reruns verification and then publishes the Rust and TypeScript packages.
+3. Push the tag, for example `git push origin v0.2.1`.
+4. `release.yml` reruns verification, publishes the Rust and TypeScript packages, and then creates or updates the GitHub Release automatically.
+
+To retry an existing tag without pushing a new one, run the workflow manually and provide the tag name.
 
 ## Trusted Publishing
 
@@ -73,4 +75,7 @@ Use the same GitHub Actions publisher settings for both:
 2. Repository: `match-pattern`
 3. Workflow filename: `release.yml`
 
-After trusted publishing works, token-based publishing should stay disabled for this workflow.
+This release workflow supports:
+
+1. tag push for normal releases
+2. workflow dispatch with a tag input for retries

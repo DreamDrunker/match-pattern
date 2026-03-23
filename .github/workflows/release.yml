@@ -1,19 +1,30 @@
 name: Release
 
 on:
-  release:
-    types:
-      - created
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to publish, for example v0.3.0
+        required: true
+        type: string
 
 permissions:
   contents: read
+
+env:
+  PUBLISH_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.PUBLISH_REF }}
       - uses: actions-rust-lang/setup-rust-toolchain@v1
       - uses: jetli/wasm-pack-action@v0.4.0
       - uses: actions/setup-node@v4
@@ -38,6 +49,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.PUBLISH_REF }}
       - uses: actions-rust-lang/setup-rust-toolchain@v1
       - uses: jetli/wasm-pack-action@v0.4.0
       - uses: actions/setup-node@v4
@@ -55,6 +68,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.PUBLISH_REF }}
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -64,3 +79,15 @@ jobs:
       - run: yarn build
       - run: npm publish --access public
         working-directory: ts
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: publish-ts
+    permissions:
+      contents: write
+    steps:
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          generate_release_notes: true
