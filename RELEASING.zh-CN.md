@@ -58,7 +58,7 @@ yarn version:bump 0.2.1
 3. 把 tag 推到远程，例如 `git push origin v0.2.1`。
 4. `release.yml` 会重新执行验证，发布 Rust 包和 TS 包，并自动创建或更新 GitHub Release。
 
-如果已有 tag 需要补发，不用重新推 tag，直接手动触发 workflow 并填入 tag 名称即可。
+如果已有版本需要补发，不用重新推 tag，直接从要发布的 ref 手动触发 workflow，并填入 tag 名称即可。
 
 ## Trusted Publishing
 

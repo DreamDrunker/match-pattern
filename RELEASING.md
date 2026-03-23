@@ -58,7 +58,7 @@ It updates all of these files together:
 3. Push the tag, for example `git push origin v0.2.1`.
 4. `release.yml` reruns verification, publishes the Rust and TypeScript packages, and then creates or updates the GitHub Release automatically.
 
-To retry an existing tag without pushing a new one, run the workflow manually and provide the tag name.
+To retry an existing version without pushing a new tag, run the workflow manually from the ref you want to publish and provide the tag name as input.
 
 ## Trusted Publishing
 

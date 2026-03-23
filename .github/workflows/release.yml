@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 env:
-  PUBLISH_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+  PUBLISH_REF: ${{ github.ref }}
   RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
 jobs:
