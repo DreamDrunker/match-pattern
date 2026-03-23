@@ -28,6 +28,10 @@
   "keywords": [],
   "author": "weiqu",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DreamDrunker/match-pattern"
+  },
   "description": "Pattern matching for JavaScript and TypeScript with typed exhaustiveness and optional Rust/WASM compile plans.",
   "dependencies": {
     "@weiqu_/match-pattern-rs": "^0.3.0"
