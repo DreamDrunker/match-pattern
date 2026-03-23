@@ -1,14 +1,26 @@
 {
   "name": "@weiqu_/match-pattern-ts",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./advanced": {
+      "types": "./dist/advanced.d.ts",
+      "import": "./dist/advanced.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "build": "tsc",
-    "test": "yarn test:node && yarn test:browser",
-    "test:node": "NODE_OPTIONS='--experimental-vm-modules' jest",
-    "test:browser": "vitest"
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "test": "npm run typecheck && npm run test:node && npm run test:browser",
+    "test:node": "vitest run --config vitest.node.config.ts",
+    "test:browser": "vitest run --config vitest.config.ts"
   },
   "files": [
     "dist"
@@ -16,20 +28,15 @@
   "keywords": [],
   "author": "weiqu",
   "license": "MIT",
-  "description": "",
+  "description": "Pattern matching for JavaScript and TypeScript with typed exhaustiveness and optional Rust/WASM compile plans.",
   "dependencies": {
-    "@weiqu_/match-pattern-rs": "^0.1.0"
+    "@weiqu_/match-pattern-rs": "^0.3.0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
     "@types/node": "^25.0.0",
     "@vitest/browser": "^4.0.15",
     "@vitest/browser-playwright": "^4.0.15",
-    "eslint": "^9.39.1",
-    "jest": "^30.2.0",
     "playwright": "^1.57.0",
-    "prettier": "^3.7.4",
-    "ts-jest": "^29.4.6",
     "typescript": "^5.9.3",
     "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.5.0",

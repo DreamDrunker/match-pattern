@@ -1,0 +1,24 @@
+{
+  "name": "@weiqu_/match-pattern-rs",
+  "type": "module",
+  "collaborators": [
+    "weiqu"
+  ],
+  "description": "Rust/WASM compiler package for the match-pattern monorepo.",
+  "version": "0.3.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DreamDrunker/match-pattern"
+  },
+  "files": [
+    "match_pattern_rs_bg.wasm",
+    "match_pattern_rs.js",
+    "match_pattern_rs.d.ts"
+  ],
+  "main": "match_pattern_rs.js",
+  "types": "match_pattern_rs.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
