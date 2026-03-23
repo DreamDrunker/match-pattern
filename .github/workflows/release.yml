@@ -58,7 +58,9 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
       - id: rs-version
-        run: echo "value=$(node -p \"require('./rs/pkg/package.json').version\")" >> "$GITHUB_OUTPUT"
+        run: |
+          version=$(node -e 'console.log(JSON.parse(require("fs").readFileSync("rs/pkg/package.json", "utf8")).version)')
+          echo "value=$version" >> "$GITHUB_OUTPUT"
       - id: rs-check
         run: |
           if npm view @weiqu_/match-pattern-rs@${{ steps.rs-version.outputs.value }} version >/dev/null 2>&1; then
@@ -88,7 +90,9 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - id: ts-version
-        run: echo "value=$(node -p \"require('./ts/package.json').version\")" >> "$GITHUB_OUTPUT"
+        run: |
+          version=$(node -e 'console.log(JSON.parse(require("fs").readFileSync("ts/package.json", "utf8")).version)')
+          echo "value=$version" >> "$GITHUB_OUTPUT"
       - id: ts-check
         run: |
           if npm view @weiqu_/match-pattern-ts@${{ steps.ts-version.outputs.value }} version >/dev/null 2>&1; then
