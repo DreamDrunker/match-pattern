@@ -57,7 +57,17 @@ jobs:
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
-      - run: wasm-pack publish --access public
+      - id: rs-version
+        run: echo "value=$(node -p \"require('./rs/pkg/package.json').version\")" >> "$GITHUB_OUTPUT"
+      - id: rs-check
+        run: |
+          if npm view @weiqu_/match-pattern-rs@${{ steps.rs-version.outputs.value }} version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.rs-check.outputs.publish == 'true'
+        run: wasm-pack publish --access public
         working-directory: rs
 
   publish-ts:
@@ -77,7 +87,17 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: yarn install --frozen-lockfile
       - run: yarn build
-      - run: npm publish --access public
+      - id: ts-version
+        run: echo "value=$(node -p \"require('./ts/package.json').version\")" >> "$GITHUB_OUTPUT"
+      - id: ts-check
+        run: |
+          if npm view @weiqu_/match-pattern-ts@${{ steps.ts-version.outputs.value }} version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.ts-check.outputs.publish == 'true'
+        run: npm publish --access public
         working-directory: ts
 
   create-release:
