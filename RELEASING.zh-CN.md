@@ -57,3 +57,20 @@ yarn version:bump 0.2.1
 2. 在 `main` 打对应 tag，例如 `v0.2.1`。
 3. 创建 GitHub Release。
 4. `release.yml` 会重新执行验证，再发布 Rust 包和 TS 包。
+
+## Trusted Publishing
+
+发布现在走 npm Trusted Publishing，通过 GitHub Actions OIDC 完成。
+
+npmjs.com 里需要分别给这两个包配置 trusted publisher：
+
+1. `@weiqu_/match-pattern-rs`
+2. `@weiqu_/match-pattern-ts`
+
+两个包都填同一组 GitHub Actions 信息：
+
+1. Organization or user: `DreamDrunker`
+2. Repository: `match-pattern`
+3. Workflow filename: `release.yml`
+
+Trusted Publishing 验证通过后，这条发布链路不再依赖 `NPM_TOKEN`。

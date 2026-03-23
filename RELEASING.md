@@ -57,3 +57,20 @@ It updates all of these files together:
 2. Create the release tag on `main`, for example `v0.2.1`.
 3. Create the GitHub Release.
 4. `release.yml` reruns verification and then publishes the Rust and TypeScript packages.
+
+## Trusted Publishing
+
+Publishing now uses npm trusted publishing through GitHub Actions OIDC.
+
+Package-side setup on npmjs.com is required for both packages:
+
+1. `@weiqu_/match-pattern-rs`
+2. `@weiqu_/match-pattern-ts`
+
+Use the same GitHub Actions publisher settings for both:
+
+1. Organization or user: `DreamDrunker`
+2. Repository: `match-pattern`
+3. Workflow filename: `release.yml`
+
+After trusted publishing works, token-based publishing should stay disabled for this workflow.
